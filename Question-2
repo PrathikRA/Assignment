@@ -1,0 +1,23 @@
+Question 2: Do Django signals run in the same thread as the caller?
+Yes, by default Django signals run in the same thread as the caller. 
+Execution is sequential and blocking unless the code has been modified to make it run in another thread.
+
+Code Snippet:
+import threading
+from django.dispatch import receiver, Signal
+
+my_signal = Signal()
+
+@receiver(my_signal)
+def signal_receiver(sender, **kwargs):
+    print(f"Signal received in thread: {threading.current_thread().name}")
+
+def emit_signal():
+    print(f"Signal emitted in thread: {threading.current_thread().name}")
+    my_signal.send(sender=None)
+
+emit_signal()
+
+Outpu:
+Signal emitted in thread: MainThread
+Signal received in thread: MainThread
