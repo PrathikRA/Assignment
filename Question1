@@ -1,0 +1,26 @@
+1. Question: Do the Django signals execute synchronously or asynchronously by default?
+Django signals are synchronous; meaning that, out of the box, 
+they are executed in the same thread of execution where the signal was emitted and execution doesn't continue until all receivers have finished executing.
+
+import time
+from django.dispatch import receiver, Signal
+
+my_signal = Signal()
+
+@receiver(my_signal)
+def signal_receiver(sender, **kwargs):
+    print("Signal received")
+    time.sleep(2)  
+    print("Signal processing finished")
+
+def emit_signal():
+    print("Before signal emit")
+    my_signal.send(sender=None)
+    print("After signal emit")
+
+Output:
+emit_signal()
+Before signal emit
+Signal received
+Signal processing finished
+After signal emit
