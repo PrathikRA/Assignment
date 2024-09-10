@@ -1,0 +1,17 @@
+1. Question: Do the Django signals execute synchronously or asynchronously by default?
+Django signals are synchronous by default. It means the signal receiver functions are triggered one after another and the current request or the current process would wait till all the receivers are done to move further.
+While this synchronous behavior is sufficient for most use cases, 
+it will lead to performance issues in certain scenarios, such as when you have many signal receivers or any of your receivers carry out some type of long-running activity. 
+Whether you need to boost performance or want to avoid blocking the main thread, you can also look into asynchronous techniques like Celery or threading, which run signal receivers asynchronously.
+
+Code Snippet:
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from time import sleep
+from myapp.models import MyModel  
+
+@receiver(post_save, sender=MyModel)
+def my_slow_task(sender, instance, **kwargs):
+    sleep(5)  # Simulate a long-running task
+    print("Signal receiver finished")
