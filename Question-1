@@ -8,9 +8,9 @@ Code Snippet:
 
 import time
 import datetime
-from django.dispatch import signal
+from django.dispatch import Signal
 
-my_signal = signal()
+my_signal = Signal()
 
 def signal_handler(sender, **kwargs):
     print(f"Signal handler started at: {datetime.datetime.now()}")
