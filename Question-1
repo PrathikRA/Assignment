@@ -7,6 +7,7 @@ Whether you need to boost performance or want to avoid blocking the main thread,
 Code Snippet:
 
 import time
+import datetime
 from django.dispatch import signal
 
 my_signal = signal()
