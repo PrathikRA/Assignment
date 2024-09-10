@@ -6,12 +6,21 @@ Whether you need to boost performance or want to avoid blocking the main thread,
 
 Code Snippet:
 
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from time import sleep
-from myapp.models import MyModel  
+import time
+from django.dispatch import signal
 
-@receiver(post_save, sender=MyModel)
-def my_slow_task(sender, instance, **kwargs):
-    sleep(5)  # Simulate a long-running task
-    print("Signal receiver finished")
+my_signal = signal()
+
+def signal_handler(sender, **kwargs):
+    print(f"Signal handler started at: {datetime.datetime.now()}")
+    time.sleep(2) 
+    print(f"Signal handler executed at: {datetime.datetime.now()}")
+
+my_signal.connect(signal_handler)
+
+def send_signal():
+    print(f"Sending signal at: {datetime.datetime.now()}")
+    my_signal.send(sender="sender")
+    print(f"Signal sent at: {datetime.datetime.now()}")
+
+send_signal()
