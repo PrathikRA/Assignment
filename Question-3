@@ -3,30 +3,31 @@ Django signals do not run within the database transaction by default, unless bei
 Signals have no transactional nature embedded into them.
 
 Code Snippet:
+
 from django.db import transaction
-from django.dispatch import receiver, Signal
-from myapp.models import SomeModel
+from django.dispatch import Signal
+from myapp.models import MyModel
 
 my_signal = Signal()
 
-@receiver(my_signal)
-def signal_receiver(sender, **kwargs):
-    print("Signal received")
-    print(f"SomeModel count: {SomeModel.objects.count()}")
+def signal_handler(sender, **kwargs):
+    print("Signal handler started")
+    MyModel.objects.create(name="from_signal")
+    raise ValueError("Signal handler failed")
 
-def emit_signal():
-    with transaction.atomic():
-        SomeModel.objects.create(name='test')
-        print("Signal emitted")
-        my_signal.send(sender=None)
-        print("End of transaction")
+my_signal.connect(signal_handler)
 
-emit_signal()
+@transaction.atomic
+def send_signal():
+    print("Sending signal...")
+    MyModel.objects.create(name="before_signal")
+    try:
+        my_signal.send(sender="sender")
+    except ValueError:
+        print("Caught exception from signal handler")
+    
+    MyModel.objects.create(name="after_signal")
+    print("Signal sent")
 
-If you want the signal to run after a transaction is committed then you must use the method transaction.on_commit().
-def emit_signal():
-    with transaction.atomic():
-        SomeModel.objects.create(name='test')
-        print("Signal emitted")
-        transaction.on_commit(lambda: my_signal.send(sender=None))
-        print("End of transaction")
+send_signal()
+
